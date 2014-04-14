@@ -1,0 +1,74 @@
+varnishtest "Test db operations"
+
+server s1 {
+	rxreq
+	expect req.url == "/new"
+	expect req.http.r == ""
+	txresp
+
+	rxreq
+	expect req.url == "/add"
+	expect req.http.r == ""
+	txresp
+
+	rxreq
+	expect req.url == "/list"
+	expect req.http.r == "1|2"
+	txresp
+
+	rxreq
+	expect req.url == "/more"
+	expect req.http.r == ""
+	txresp
+
+	rxreq
+	expect req.url == "/list"
+	expect req.http.r == "1|2;3|4"
+	txresp
+
+	rxreq
+	expect req.url == "/close"
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import sqlite3 from "${vmod_topbuild}/src/.libs/libvmod_sqlite3.so";
+
+	sub vcl_init {
+		sqlite3.open("mydata.db", "|;");
+	}
+
+	sub vcl_recv {
+		if (req.url ~ "^/new") {
+			set req.http.r = sqlite3.exec(
+			    "CREATE TABLE TEST(a INTEGER, b INTEGER)");
+		} else if (req.url ~ "^/add") {
+			set req.http.r = sqlite3.exec(
+			    "INSERT INTO TEST VALUES(1, 2)");
+		} else if (req.url ~ "^/more") {
+			set req.http.r = sqlite3.exec(
+			    "INSERT INTO TEST VALUES(3, 4)");
+		} else if (req.url ~ "^/list") {
+			set req.http.r = sqlite3.exec(
+			    "SELECT a, b FROM TEST");
+		} else if (req.url ~ "^/close") {
+			sqlite3.close();
+		}
+		return (pass);
+	}
+} -start
+
+client c1 {
+	txreq -url /new
+	rxresp
+	txreq -url /add
+	rxresp
+	txreq -url /list
+	rxresp
+	txreq -url /more
+	rxresp
+	txreq -url /list
+	rxresp
+	txreq -url /close
+	rxresp
+} -run
