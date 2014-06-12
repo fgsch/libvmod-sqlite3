@@ -71,7 +71,8 @@ vmod_open(const struct vrt_ctx *ctx, struct vmod_priv *priv,
 	struct vmod_sqlite3 *v;
 	sqlite3 *db;
 
-	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	(void)ctx;
+
 	AN(priv);
 
 	if (priv->priv != NULL) {
@@ -178,7 +179,8 @@ vmod_exec(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING sql)
 VCL_VOID __match_proto__(td_sqlite3_close)
 vmod_close(const struct vrt_ctx *ctx, struct vmod_priv *priv)
 {
-	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	(void)ctx;
+
 	AN(priv);
 
 	if (priv->priv != NULL) {
