@@ -11,8 +11,8 @@ AC_PROG_LIBTOOL
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([SQLITE3], [sqlite3])
 
-AC_PATH_PROGS([PYTHON], [python3.3 python3 python2.7 python2 python])
-test -z "$PYTHON" && AC_MSG_ERROR([Python is required.])
+AC_PATH_PROGS([PYTHON], [python3 python2.7 python2.6])
+test -z "$PYTHON" && AC_MSG_ERROR([Python 2.6 or greater is required.])
 
 AC_PATH_PROG([RST2MAN], [rst2man])
 test -z "$RST2MAN" && AC_MSG_ERROR([rst2man is required.])
