@@ -75,7 +75,7 @@ vmod_open(const struct vrt_ctx *ctx, struct vmod_priv *priv,
 
 	AN(priv);
 
-	if (priv->priv != NULL) {
+	if (priv->priv) {
 		CAST_OBJ_NOTNULL(v, priv->priv, VMOD_SQLITE3_MAGIC);
 		return;
 	}
@@ -149,7 +149,7 @@ vmod_exec(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING sql)
 	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
 	AN(priv);
 
-	if (priv->priv == NULL) {
+	if (!priv->priv) {
 		e = (char *)sqlite3_errstr(SQLITE_ERROR);
 		p = WS_Copy(ctx->ws, e, -1);
 		return (p);
@@ -183,7 +183,7 @@ vmod_close(const struct vrt_ctx *ctx, struct vmod_priv *priv)
 
 	AN(priv);
 
-	if (priv->priv != NULL) {
+	if (priv->priv) {
 		vmod_free(priv->priv);
 		priv->priv = NULL;
 		priv->free = NULL;
