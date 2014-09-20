@@ -24,29 +24,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$Module sqlite3 3 sqlite3
-
-$Function VOID open(PRIV_VCL, STRING, STRING)
-
-Description
-	Open the SQLite database specified by the 1st argument and set
-	the field and row delimiters to be used in `exec()` to the 1st
-	and 2nd character, respectively, of the 2nd argument.
-Example
-	sqlite3.open("file:mysqlitedb.db?mode=ro", "\|;");
-
-$Function STRING exec(PRIV_VCL, STRING)
-
-Description
-	Run an SQL statements and return any result rows coming out
-	of their evaluation.  If an error occurs return the error text
-	instead.
-Example
-	set req.http.x-results = sqlite3.exec("SELECT foo FROM bar");
-
-$Function VOID close(PRIV_VCL)
-
-Description
-	Close a previously opened SQLite database.
-Example
-	sqlite3.close()
+Module sqlite3
+Function VOID open(PRIV_VCL, STRING, STRING)
+Function STRING exec(PRIV_VCL, STRING)
+Function VOID close(PRIV_VCL)

@@ -33,7 +33,7 @@
 #include <sqlite3.h>
 
 #include "vrt.h"
-#include "cache/cache.h"
+#include "bin/varnishd/cache.h"
 
 #include "vcc_if.h"
 
@@ -64,14 +64,14 @@ vmod_free(void *priv)
 	FREE_OBJ(v);
 }
 
-VCL_VOID __match_proto__(td_sqlite3_open)
-vmod_open(const struct vrt_ctx *ctx, struct vmod_priv *priv,
-    VCL_STRING filename, VCL_STRING delims)
+void __match_proto__(td_sqlite3_open)
+vmod_open(struct sess *sp, struct vmod_priv *priv,
+    const char *filename, const char *delims)
 {
 	struct vmod_sqlite3 *v;
 	sqlite3 *db;
 
-	(void)ctx;
+	(void)sp;
 
 	AN(priv);
 
@@ -139,26 +139,26 @@ do {					\
 		return (0);
 }
 
-VCL_STRING __match_proto__(td_sqlite3_exec)
-vmod_exec(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING sql)
+const char * __match_proto__(td_sqlite3_exec)
+vmod_exec(struct sess *sp, struct vmod_priv *priv, const char *sql)
 {
 	struct vmod_sqlite3_result r;
 	struct vmod_sqlite3 *v;
 	char *e, *p;
 
-	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	CHECK_OBJ_NOTNULL(sp, SESS_MAGIC);
 	AN(priv);
 
 	if (!priv->priv) {
 		e = (char *)sqlite3_errstr(SQLITE_ERROR);
-		p = WS_Copy(ctx->ws, e, -1);
+		p = WS_Dup(sp->ws, e);
 		return (p);
 	}
 
 	CAST_OBJ_NOTNULL(v, priv->priv, VMOD_SQLITE3_MAGIC);
 
-	r.u = WS_Reserve(ctx->ws, 0);
-	r.p = ctx->ws->f;
+	r.u = WS_Reserve(sp->ws, 0);
+	r.p = sp->ws->f;
 	r.d = v->d;
 	r.l = 0;
 	r.r = 0;
@@ -166,20 +166,20 @@ vmod_exec(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING sql)
 	*(r.p) = '\0';
 
 	if (sqlite3_exec(v->db, sql, vmod_exec_cb, &r, &e) != SQLITE_OK) {
-		WS_Release(ctx->ws, 0);
-		p = WS_Copy(ctx->ws, e, -1);
+		WS_Release(sp->ws, 0);
+		p = WS_Dup(sp->ws, e);
 		sqlite3_free(e);
 		return (p);
 	}
 
-	WS_Release(ctx->ws, r.l + 1);
+	WS_Release(sp->ws, r.l + 1);
 	return (r.p);
 }
 
-VCL_VOID __match_proto__(td_sqlite3_close)
-vmod_close(const struct vrt_ctx *ctx, struct vmod_priv *priv)
+void __match_proto__(td_sqlite3_close)
+vmod_close(struct sess *sp, struct vmod_priv *priv)
 {
-	(void)ctx;
+	(void)sp;
 
 	AN(priv);
 
