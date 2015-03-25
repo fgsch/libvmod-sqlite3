@@ -1,12 +1,12 @@
 Name: vmod-sqlite3
-Version: 0.1
+Version: 0.1.0
 Release: 1%{?dist}
 Summary: SQLite3 VMOD for Varnish
 
 Group: System Environment/Daemons
 License: BSD
 URL: https://github.com/fgsch/libvmod-sqlite3
-Source0: https://github.com/fgsch/libvmod-sqlite3/libvmod-sqlite3-%{version}.tar.gz
+Source0: %{url}/archive/libvmod-sqlite3-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: pkgconfig(varnishapi)
@@ -43,5 +43,5 @@ rm -rf %{buildroot}
 %{_mandir}/man3/*
 
 %changelog
-* Wed Mar 25 2015 Federico G. Schwindt <fgsch@lodoss.net> - 0.1-1
-- Initial version.
+* Wed Mar 25 2015 Federico G. Schwindt <fgsch@lodoss.net> - 0.1.0-1
+- Initial release.
