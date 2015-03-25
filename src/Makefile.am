@@ -9,11 +9,11 @@ libvmod_sqlite3_la_LDFLAGS = -module -export-dynamic -avoid-version -shared \
 libvmod_sqlite3_la_SOURCES = \
 	vmod_sqlite3.c
 if !WITH_SYSTEM_SQLITE
-libvmod_sqlite3_la_CFLAGS += -I$(top_srcdir)/thirdparty
+libvmod_sqlite3_la_CFLAGS += -I$(top_srcdir)/sqlite3
 libvmod_sqlite3_la_SOURCES += \
-	$(top_srcdir)/thirdparty/sqlite3.c \
-	$(top_srcdir)/thirdparty/sqlite3.h \
-	$(top_srcdir)/thirdparty/sqlite3ext.h
+	$(top_srcdir)/sqlite3/sqlite3.c \
+	$(top_srcdir)/sqlite3/sqlite3.h \
+	$(top_srcdir)/sqlite3/sqlite3ext.h
 endif
 nodist_libvmod_sqlite3_la_SOURCES = \
 	vcc_if.c \
