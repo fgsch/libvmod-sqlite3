@@ -100,7 +100,6 @@ vmod_exec_cb(void *arg, int argc, char **argv, char **name)
 {
 	struct vmod_sqlite3_result *r = arg;
 	char *p;
-	size_t l;
 	int i;
 
 	(void)name;
@@ -109,8 +108,7 @@ vmod_exec_cb(void *arg, int argc, char **argv, char **name)
 
 #define COPY(dst, src, len)		\
 do {					\
-	l = (len);			\
-	if (r->l + l >= r->u)		\
+	if (r->l + (len) >= r->u)	\
 		goto error;		\
 	memcpy((dst), (src), (len));	\
 	r->l += (len);			\
