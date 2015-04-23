@@ -123,7 +123,10 @@ do {					\
 	for (i = 0; i < argc; i++) {
 		if (i)
 			COPY(p, &r->d[0], 1);
-		COPY(p, argv[i], strlen(argv[i]));
+		if (argv[i])
+			COPY(p, argv[i], strlen(argv[i]));
+		else
+			COPY(p, "NULL", 4);
 	}
 
 #undef COPY

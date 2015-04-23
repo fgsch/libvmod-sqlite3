@@ -1,0 +1,27 @@
+varnishtest "Test NULL handling"
+
+server s1 {
+	rxreq
+	expect req.http.r == "NULL|0"
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import sqlite3 from "${vmod_topbuild}/src/.libs/libvmod_sqlite3.so";
+
+	sub vcl_init {
+		sqlite3.open(":memory:", "|;");
+	}
+
+	sub vcl_recv {
+		set req.http.r = sqlite3.exec({"
+		    CREATE TABLE TEST(a, b);
+		    INSERT INTO TEST VALUES(NULL, 0);
+		    SELECT * FROM TEST"});
+	}
+} -start
+
+client c1 {
+	txreq
+	rxresp
+} -run
