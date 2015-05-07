@@ -44,5 +44,8 @@ if test -z "$VMODDIR"; then
   test -z "$VMODDIR" && AC_MSG_ERROR([Cannot determine vmod installation directory.])
 fi
 
+VMOD_TESTS="$(cd $srcdir/src && echo tests/*.vtc)"
+AC_SUBST(VMOD_TESTS)
+
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
