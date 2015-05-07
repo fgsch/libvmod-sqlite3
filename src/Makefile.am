@@ -21,7 +21,10 @@ nodist_libvmod_sqlite3_la_SOURCES = \
 
 dist_man_MANS = vmod_sqlite3.3
 
-VMOD_TESTS = tests/*.vtc
+VTC_LOG_COMPILER = $(VARNISHTEST) -v -i \
+	-Dvarnishd=$(VARNISHD) -Dvmod_topbuild=$(abs_top_builddir)
+TEST_EXTENSIONS = .vtc
+TESTS = @VMOD_TESTS@
 
 $(libvmod_sqlite3_la_OBJECTS): vcc_if.h
 
@@ -31,12 +34,8 @@ vcc_if.c vcc_if.h vmod_sqlite3.man.rst: $(VMODTOOL) $(top_srcdir)/src/vmod.vcc
 vmod_sqlite3.3: vmod_sqlite3.man.rst
 	${RST2MAN} $? $@
 
-check:
-	$(VARNISHTEST) -Dvarnishd=$(VARNISHD) \
-	    -Dvmod_topbuild=$(abs_top_builddir) $(VMOD_TESTS)
-
 EXTRA_DIST = vmod.vcc \
-	$(VMOD_TESTS)
+	$(TESTS)
 
 CLEANFILES = $(builddir)/vcc_if.c \
 	$(builddir)/vcc_if.h \
