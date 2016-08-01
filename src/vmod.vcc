@@ -42,7 +42,15 @@ Description
 	of their evaluation.  If an error occurs return the error text
 	instead.
 Example
-	set req.http.x-results = sqlite3.exec("SELECT foo FROM bar");
+	set req.http.results = sqlite3.exec("SELECT foo FROM bar");
+
+$Function STRING escape(STRING)
+
+Description
+	Escape the input string by doubling any single-quote (')
+	character and return the result.
+Example
+	set req.http.url = sqlite3.escape(req.url);
 
 $Function VOID close(PRIV_VCL)
 

@@ -1,0 +1,21 @@
+varnishtest "Test sqlite3.escape"
+
+server s1 {
+	rxreq
+	expect req.http.url == "/f''o''o"
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import sqlite3 from "${vmod_topbuild}/src/.libs/libvmod_sqlite3.so";
+
+	sub vcl_recv {
+		set req.http.url = sqlite3.escape(req.url);
+		return (pass);
+	}
+} -start
+
+client c1 {
+	txreq -url /f'o'o
+	rxresp
+} -run

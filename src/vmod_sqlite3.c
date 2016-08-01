@@ -177,6 +177,24 @@ vmod_exec(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING sql)
 	return (r.p);
 }
 
+VCL_STRING __match_proto__(td_sqlite3_escape)
+vmod_escape(const struct vrt_ctx *ctx, VCL_STRING s)
+{
+	unsigned u;
+	char *p;
+
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+	u = WS_Reserve(ctx->ws, 0);
+	if (u > 0) {
+		p = sqlite3_snprintf(u, ctx->ws->f, "%q", s);
+		WS_Release(ctx->ws, strlen(p) + 1);
+	} else {
+		p = NULL;
+		WS_Release(ctx->ws, 0);
+	}
+	return (p);
+}
+
 VCL_VOID __match_proto__(td_sqlite3_close)
 vmod_close(const struct vrt_ctx *ctx, struct vmod_priv *priv)
 {
