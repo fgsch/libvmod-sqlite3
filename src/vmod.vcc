@@ -27,4 +27,5 @@
 Module sqlite3
 Function VOID open(PRIV_VCL, STRING, STRING)
 Function STRING exec(PRIV_VCL, STRING)
+Function STRING escape(STRING)
 Function VOID close(PRIV_VCL)

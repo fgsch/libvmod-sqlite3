@@ -177,6 +177,24 @@ vmod_exec(struct sess *sp, struct vmod_priv *priv, const char *sql)
 	return (r.p);
 }
 
+const char * __match_proto__(td_sqlite3_escape)
+vmod_escape(struct sess *sp, const char *s)
+{
+	unsigned u;
+	char *p;
+
+	CHECK_OBJ_NOTNULL(sp, SESS_MAGIC);
+	u = WS_Reserve(sp->ws, 0);
+	if (u > 0) {
+		p = sqlite3_snprintf(u, sp->ws->f, "%q", s);
+		WS_Release(sp->ws, strlen(p) + 1);
+	} else {
+		p = NULL;
+		WS_Release(sp->ws, 0);
+	}
+	return (p);
+}
+
 void __match_proto__(td_sqlite3_close)
 vmod_close(struct sess *sp, struct vmod_priv *priv)
 {
