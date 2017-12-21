@@ -35,7 +35,7 @@ varnish v1 -vcl+backend {
 	import sqlite3 from "${vmod_topbuild}/src/.libs/libvmod_sqlite3.so";
 
 	sub vcl_init {
-		sqlite3.open("mydata.db", "|;");
+		sqlite3.open(":memory:", "|;");
 	}
 
 	sub vcl_recv {
