@@ -32,10 +32,9 @@
 
 #include <sqlite3.h>
 
-#include "vrt.h"
 #include "cache/cache.h"
-
-#include "vcc_if.h"
+#include "vtim.h"
+#include "vcc_sqlite3_if.h"
 
 struct vmod_sqlite3 {
 	unsigned	 magic;
@@ -64,7 +63,7 @@ vmod_free(void *priv)
 	FREE_OBJ(v);
 }
 
-VCL_VOID __match_proto__(td_sqlite3_open)
+VCL_VOID v_matchproto_(td_sqlite3_open)
 vmod_open(const struct vrt_ctx *ctx, struct vmod_priv *priv,
     VCL_STRING filename, VCL_STRING delims)
 {
@@ -140,7 +139,7 @@ do {					\
 		return (0);
 }
 
-VCL_STRING __match_proto__(td_sqlite3_exec)
+VCL_STRING v_matchproto_(td_sqlite3_exec)
 vmod_exec(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING sql)
 {
 	struct vmod_sqlite3_result r;
@@ -177,7 +176,7 @@ vmod_exec(const struct vrt_ctx *ctx, struct vmod_priv *priv, VCL_STRING sql)
 	return (r.p);
 }
 
-VCL_STRING __match_proto__(td_sqlite3_escape)
+VCL_STRING v_matchproto_(td_sqlite3_escape)
 vmod_escape(const struct vrt_ctx *ctx, VCL_STRING s)
 {
 	unsigned u;
@@ -195,7 +194,7 @@ vmod_escape(const struct vrt_ctx *ctx, VCL_STRING s)
 	return (p);
 }
 
-VCL_VOID __match_proto__(td_sqlite3_close)
+VCL_VOID v_matchproto_(td_sqlite3_close)
 vmod_close(const struct vrt_ctx *ctx, struct vmod_priv *priv)
 {
 	(void)ctx;

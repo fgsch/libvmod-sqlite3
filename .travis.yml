@@ -1,19 +1,45 @@
+---
+sudo: required
+dist: bionic
+
 language: c
+
+addons:
+  apt:
+    packages:
+    - python-docutils
+
+before_install:
+  - apt update
+  - apt install debian-archive-keyring
+  - apt install curl gnupg apt-transport-https
+  - echo "deb https://packagecloud.io/varnishcache/varnish60lts/ubuntu/ bionic main \
+    deb-src https://packagecloud.io/varnishcache/varnish60lts/ubuntu/ bionic main" > /etc/apt/sources.list.d/varnishcache_varnish60lts.list
+  or:
+  - curl -L https://packagecloud.io/varnishcache/varnish60lts/gpgkey | sudo apt-key add -
+  and:
+  - sudo apt update
+  - apt install varnish varnish-dev
+
+before_install(manual):
+  - set -e
+  - wget https://github.com/varnishcache/varnish-cache/archive/master.tar.gz
+  - tar -zxf master.tar.gz
+  - pushd varnish-cache-master
+  - ./autogen.sh
+  - ./configure --prefix=/usr
+  - make -sj32
+  - sudo make install
+  - popd
+
+before_script:
+  - ./autogen.sh
+  - ./configure --prefix=/usr
+  - make -j4
+
+script:
+  - make check -j4
+
 compiler:
   - clang
   - gcc
-env:
-  - VER=4.0
-  - VER=4.1
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install apt-transport-https python-docutils
-  - curl -s https://repo.varnish-cache.org/ubuntu/GPG-key.txt |
-    sudo apt-key add -
-  - echo "deb https://repo.varnish-cache.org/ubuntu/ precise varnish-$VER" |
-    sudo tee /etc/apt/sources.list.d/varnish-cache.list
-  - sudo apt-get update
-  - sudo apt-get install varnish libvarnishapi-dev
-  - ./autogen.sh
-script:
-  - ./configure && make CFLAGS="-Wall -Wextra -Werror" && make check

@@ -7,7 +7,7 @@ server s1 {
 } -start
 
 varnish v1 -vcl+backend {
-	import sqlite3 from "${vmod_topbuild}/src/.libs/libvmod_sqlite3.so";
+	import ${vmod_sqlite3};
 
 	sub vcl_recv {
 		set req.http.url = sqlite3.escape(req.url);

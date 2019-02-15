@@ -1,17 +1,23 @@
-AC_INIT([libvmod-sqlite3], [0.1.0])
+AC_PREREQ([2.68])
+AC_INIT([libvmod-sqlite3], [0.1], [], [vmod-sqlite3])
+AC_COPYRIGHT([Public Domain])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_SRCDIR(src/vmod.vcc)
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_SRCDIR(src/vmod_sqlite3.vcc)
+AC_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE([foreign color-tests parallel-tests])
+AM_INIT_AUTOMAKE([1.12 -Wall -Werror foreign parallel-tests])
+AM_SILENT_RULES([yes])
+AM_PROG_AR
 
-AC_DISABLE_STATIC
+LT_PREREQ([2.2.6])
+LT_INIT([dlopen disable-static])
 
-AC_PROG_CC
-AC_PROG_LIBTOOL
+AX_PTHREAD(,[AC_MSG_ERROR([Could not configure pthreads support])])
 
-PKG_PROG_PKG_CONFIG
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
 
 AC_ARG_WITH([system-sqlite],
   [AS_HELP_STRING([--with-system-sqlite],[])],
@@ -21,21 +27,27 @@ AC_ARG_WITH([system-sqlite],
 )
 AM_CONDITIONAL([WITH_SYSTEM_SQLITE], [test x$with_system_sqlite = xyes])
 
-AC_PATH_PROGS([PYTHON], [python3 python2.7 python2.6])
-test -z "$PYTHON" && AC_MSG_ERROR([Python 2.6 or greater is required.])
+AC_ARG_WITH([rst2man],
+	AS_HELP_STRING(
+		[--with-rst2man=PATH],
+		[Location of rst2man (auto)]),
+	[RST2MAN="$withval"],
+	AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], []))
 
-AC_PATH_PROG([RST2MAN], [rst2man])
-test -z "$RST2MAN" && AC_MSG_ERROR([rst2man is required.])
+m4_ifndef([VARNISH_PREREQ], AC_MSG_ERROR([Need varnish.m4 -- see README.rst]))
 
-VARNISH_VMOD_INCLUDES
-VARNISH_VMOD_DIR
-VARNISH_VMODTOOL
-
-AC_PATH_PROG([VARNISHTEST], [varnishtest])
-AC_PATH_PROG([VARNISHD], [varnishd])
+VARNISH_PREREQ([6.0])
+VARNISH_VMODS([sqlite3])
 
 VMOD_TESTS="$(cd $srcdir/src && echo tests/*.vtc)"
 AC_SUBST(VMOD_TESTS)
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+PKG_CHECK_VAR([LIBVARNISHAPI_LIBDIR], [varnishapi], [libdir])
+AC_SUBST([VARNISH_LIBRARY_PATH],
+	[$LIBVARNISHAPI_LIBDIR:$LIBVARNISHAPI_LIBDIR/varnish])
+
+AC_CONFIG_FILES([
+	Makefile
+	src/Makefile
+])
 AC_OUTPUT
